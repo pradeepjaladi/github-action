@@ -12,6 +12,9 @@ class OAuthClient {
     this.baseUrl = baseUrl
     this.clientId = clientId
     this.clientSecret = clientSecret
+    core.debug(
+      `Base URL : ${baseUrl} Client ID : ${clientId} Client Secret : ${clientSecret}`
+    )
   }
 
   /**
@@ -19,6 +22,9 @@ class OAuthClient {
    * @returns {string} Base64 encoded client credentials.
    */
   getAuthorizationHeader() {
+    core.debug(
+      `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
+    )
     return `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
   }
 
@@ -30,6 +36,8 @@ class OAuthClient {
    */
   async requestToken(uname, pwd) {
     const url = `${this.baseUrl}/oauth/token`
+
+    core.debug(`Login URL : ${url}`)
 
     // Headers for the request
     const headers = {
