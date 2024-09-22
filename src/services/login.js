@@ -58,8 +58,7 @@ class OAuthClient {
       const httpClient = new http.HttpClient()
 
       const response = await httpClient.post(url, body, { headers })
-      console.log(`Response : ${response.data}`)
-      return response.data // Return the full response data, including the access token
+      return response.readBody() // Return the full response data, including the access token
     } catch (error) {
       // Handle error and throw it back for the caller to manage
       throw new Error(

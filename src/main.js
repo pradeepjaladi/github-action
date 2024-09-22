@@ -40,11 +40,13 @@ async function run() {
     // Create a new instance of OAuthClient with your base URL, client ID, and client secret
     const client = new OAuthClient(url, 'apitryout', '')
     const tokenResponse = await client.requestToken(username, password)
-    const token = tokenResponse.access_token
-    core.debug(`token: ${token}`)
+    core.debug(`tokenResponse: ${tokenResponse}`)
+    const response = JSON.parse(tokenResponse)
+    core.debug(`response: ${response}`)
+    core.debug(`token: ${response.access_token}`)
 
     // Log the access token
-    console.log('Access Token:', tokenResponse.access_token)
+    console.log('Access Token:', response.access_token)
 
     const projectBaseDir = process.env.GITHUB_WORKSPACE
     const filePath = path.join(projectBaseDir, '/target')
