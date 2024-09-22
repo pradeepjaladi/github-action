@@ -37,11 +37,6 @@ async function run() {
     //core.debug(`Project ID: ${project}`)
     //core.debug(`Release ID: ${releaseId}`)
 
-    // Here you would add your logic to interact with the URL, using the inputs
-
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
-
     // Create a new instance of OAuthClient with your base URL, client ID, and client secret
     const client = new OAuthClient(url, 'apitryout', '')
     const tokenResponse = await client.requestToken(username, password)

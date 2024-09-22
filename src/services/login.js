@@ -1,3 +1,4 @@
+const core = require('@actions/core')
 const http = require('@actions/http-client')
 
 class OAuthClient {
@@ -27,7 +28,7 @@ class OAuthClient {
    * @param {string} password - The user's password.
    * @returns {Promise<Object>} A promise that resolves to the OAuth token response.
    */
-  async requestToken(username, password) {
+  async requestToken(uname, pwd) {
     const url = `${this.baseUrl}/oauth/token`
 
     // Headers for the request
@@ -36,17 +37,21 @@ class OAuthClient {
       Authorization: this.getAuthorizationHeader()
     }
 
-    // Body parameters (encoded as x-www-form-urlencoded)
-    const formData = new URLSearchParams()
-    formData.append('grant_type', 'password')
-    formData.append('username', username)
-    formData.append('password', password)
+    const body = {
+      grant_type: 'password',
+      username: uname,
+      password: pwd
+    }
+
+    core.debug(`Headers : ${headers}`)
+    core.debug(`Body : ${body}`)
 
     try {
       // Make the POST request to fetch the token
       const httpClient = new http.HttpClient()
 
-      const response = await httpClient.post(url, formData, { headers })
+      const response = await httpClient.post(url, body, { headers })
+      core.debug(`Response : ${response.data}`)
       return response.data // Return the full response data, including the access token
     } catch (error) {
       // Handle error and throw it back for the caller to manage
