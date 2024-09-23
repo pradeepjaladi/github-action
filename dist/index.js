@@ -28093,7 +28093,7 @@ class OAuthClient {
     } catch (error) {
       // Handle error and throw it back for the caller to manage
       throw new Error(
-        `Error fetching token: ${error.response ? error.response.data : error.message}`
+        `Error fetching token: ${error.response ? error.response.readBody() : error.message}`
       )
     }
   }
