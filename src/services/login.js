@@ -1,4 +1,6 @@
 const http = require('@actions/http-client')
+const core = require('@actions/core')
+const querystring = require('querystring')
 
 class OAuthClient {
   /**
@@ -36,25 +38,33 @@ class OAuthClient {
   async requestToken(username, password) {
     const url = `${this.baseUrl}/oauth/token`
     const loginData = `grant_type=password&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-    const args = {
-      data: loginData,
-      headers: {
-        Authorization: this.getAuthorizationHeader(),
-        'Content-type': `application/x-www-form-urlencoded;charset=UTF-8`
-      }
+
+    // Set headers
+    const headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: this.getAuthorizationHeader()
     }
 
     try {
       // Make the POST request to fetch the token
       const httpClient = new http.HttpClient()
 
-      const response = await httpClient.post(url, args)
-      return response.readBody() // Return the full response data, including the access token
+      const response = await httpClient.post(url, loginData, headers)
+      if (
+        response.message.statusCode >= 200 &&
+        response.message.statusCode < 300
+      ) {
+        // Read and parse the response body
+        const responseBody = await response.readBody()
+        return JSON.parse(responseBody)
+      } else {
+        throw new Error(
+          `Request failed with status code ${response.message.statusCode}`
+        )
+      }
     } catch (error) {
-      // Handle error and throw it back for the caller to manage
-      throw new Error(
-        `Error during getting the token: ${error.response ? error.response.readBody() : error.message}`
-      )
+      core.setFailed(`Error in POST request: ${error.message}`)
+      throw error
     }
   }
 }
