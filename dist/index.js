@@ -28064,36 +28064,27 @@ class OAuthClient {
    * @param {string} password - The user's password.
    * @returns {Promise<Object>} A promise that resolves to the OAuth token response.
    */
-  async requestToken(uname, pwd) {
+  async requestToken(username, password) {
     const url = `${this.baseUrl}/oauth/token`
-
-    console.log(`Login URL : ${url}`)
-
-    // Headers for the request
-    const headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: this.getAuthorizationHeader()
+    const loginData = `grant_type=password&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+    const args = {
+      data: loginData,
+      headers: {
+        Authorization: this.getAuthorizationHeader(),
+        'Content-type': `application/x-www-form-urlencoded;charset=UTF-8`
+      }
     }
-
-    const body = {
-      grant_type: 'password',
-      username: uname,
-      password: pwd
-    }
-
-    console.log(`Headers : ${headers}`)
-    console.log(`Body : ${body}`)
 
     try {
       // Make the POST request to fetch the token
       const httpClient = new http.HttpClient()
 
-      const response = await httpClient.post(url, body, { headers })
+      const response = await httpClient.post(url, args)
       return response.readBody() // Return the full response data, including the access token
     } catch (error) {
       // Handle error and throw it back for the caller to manage
       throw new Error(
-        `Error fetching token: ${error.response ? error.response.readBody() : error.message}`
+        `Error during getting the token: ${error.response ? error.response.readBody() : error.message}`
       )
     }
   }
