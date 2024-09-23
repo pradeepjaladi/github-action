@@ -1,4 +1,4 @@
-const http = require('@actions/http-client')
+const Client = require('node-rest-client').Client
 const core = require('@actions/core')
 const querystring = require('querystring')
 
@@ -36,36 +36,27 @@ class OAuthClient {
    * @returns {Promise<Object>} A promise that resolves to the OAuth token response.
    */
   async requestToken(username, password) {
-    const url = `${this.baseUrl}/oauth/token`
+    const loginUrl = `${this.baseUrl}/oauth/token`
     const loginData = `grant_type=password&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+    const client = new Client()
 
-    // Set headers
-    const headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: this.getAuthorizationHeader()
-    }
-
-    try {
-      // Make the POST request to fetch the token
-      const httpClient = new http.HttpClient()
-
-      const response = await httpClient.post(url, loginData, headers)
-      if (
-        response.message.statusCode >= 200 &&
-        response.message.statusCode < 300
-      ) {
-        // Read and parse the response body
-        const responseBody = await response.readBody()
-        return JSON.parse(responseBody)
-      } else {
-        throw new Error(
-          `Request failed with status code ${response.message.statusCode}`
-        )
+    const args = {
+      data: loginData,
+      headers: {
+        Authorization: this.getAuthorizationHeader(),
+        'Content-type': `application/x-www-form-urlencoded;charset=UTF-8`
       }
-    } catch (error) {
-      core.setFailed(`Error in POST request: ${error.message}`)
-      throw error
     }
+    return new Promise()((resolve, reject) => {
+      client.post(loginUrl, args, (data, response) => {
+        if (data.error) {
+          console.log(data.error_description)
+          resolve(false)
+          return
+        }
+        resolve(data)
+      })
+    })
   }
 }
 
