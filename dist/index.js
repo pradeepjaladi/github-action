@@ -37648,8 +37648,6 @@ module.exports = FileManager
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const Client = (__nccwpck_require__(7487)/* .Client */ .K)
-const core = __nccwpck_require__(2186)
-const querystring = __nccwpck_require__(3477)
 
 class OAuthClient {
   /**
@@ -37663,7 +37661,7 @@ class OAuthClient {
     this.clientId = clientId
     this.clientSecret = clientSecret
     console.log(
-      `Base URL : ${baseUrl} Client ID : ${clientId} Client Secret : ${clientSecret}`
+      `Base URL: ${baseUrl}, Client ID: ${clientId}, Client Secret: ${clientSecret}`
     )
   }
 
@@ -37672,9 +37670,6 @@ class OAuthClient {
    * @returns {string} Base64 encoded client credentials.
    */
   getAuthorizationHeader() {
-    console.log(
-      `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
-    )
     return `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
   }
 
@@ -37684,7 +37679,7 @@ class OAuthClient {
    * @param {string} password - The user's password.
    * @returns {Promise<Object>} A promise that resolves to the OAuth token response.
    */
-  async requestToken(username, password) {
+  requestToken(username, password) {
     const loginUrl = `${this.baseUrl}/oauth/token`
     const loginData = `grant_type=password&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
     const client = new Client()
@@ -37693,18 +37688,24 @@ class OAuthClient {
       data: loginData,
       headers: {
         Authorization: this.getAuthorizationHeader(),
-        'Content-type': `application/x-www-form-urlencoded;charset=UTF-8`
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
       }
     }
-    return new Promise()((resolve, reject) => {
-      client.post(loginUrl, args, (data, response) => {
-        if (data.error) {
-          console.log(data.error_description)
-          resolve(false)
-          return
-        }
-        resolve(data)
-      })
+
+    // Correctly creating and resolving the Promise
+    return new Promise((resolve, reject) => {
+      client
+        .post(loginUrl, args, (data, response) => {
+          if (data.error) {
+            console.error('Error:', data.error_description)
+            reject(new Error(data.error_description))
+          } else {
+            resolve(data)
+          }
+        })
+        .on('error', err => {
+          reject(new Error(`HTTP Request Error: ${err.message}`))
+        })
     })
   }
 }
