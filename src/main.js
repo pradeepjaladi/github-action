@@ -1,6 +1,6 @@
 const core = require('@actions/core')
 const { wait } = require('./wait')
-const { getTestResults } = require('./services/filereader')
+const FileManager = require('./services/filereader')
 const path = require('path')
 const OAuthClient = require('./services/login')
 
@@ -43,13 +43,11 @@ async function run() {
     core.debug(`tokenResponse: ${response}`)
     core.debug(`token: ${response.access_token}`)
 
-    // Log the access token
-    core.debug('Access Token:', response.access_token)
-
     const projectBaseDir = process.env.GITHUB_WORKSPACE
     const filePath = path.join(projectBaseDir, '/target')
 
-    const files = getTestResults(filePath, pattern)
+    const fileManager = new FileManager()
+    const files = fileManager.getTestResults(filePath, pattern)
     console.log('Found files:', files)
   } catch (error) {
     // Fail the workflow run if an error occurs

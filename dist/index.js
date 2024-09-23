@@ -37529,7 +37529,7 @@ exports["default"] = _default;
 
 const core = __nccwpck_require__(2186)
 const { wait } = __nccwpck_require__(1312)
-const { getTestResults } = __nccwpck_require__(1984)
+const FileManager = __nccwpck_require__(1984)
 const path = __nccwpck_require__(1017)
 const OAuthClient = __nccwpck_require__(523)
 
@@ -37572,13 +37572,11 @@ async function run() {
     core.debug(`tokenResponse: ${response}`)
     core.debug(`token: ${response.access_token}`)
 
-    // Log the access token
-    core.debug('Access Token:', response.access_token)
-
     const projectBaseDir = process.env.GITHUB_WORKSPACE
     const filePath = path.join(projectBaseDir, '/target')
 
-    const files = getTestResults(filePath, pattern)
+    const fileManager = new FileManager()
+    const files = fileManager.getTestResults(filePath, pattern)
     console.log('Found files:', files)
   } catch (error) {
     // Fail the workflow run if an error occurs
@@ -37606,16 +37604,17 @@ class FileManager {
    * @param {string} pattern - The glob pattern to match file names.
    * @returns {Promise<string[]>} A promise that resolves to an array of matching file paths.
    */
-  async findFiles(pattern) {
+  findFiles(pattern) {
     try {
       // Create a globber object with the specified pattern
-      const globber = await glob.create(pattern)
+      const globber = glob.create(pattern)
 
       // Get all matching files as an array
-      const files = await globber.glob()
+      const files = globber.glob()
 
       for (const file of files) {
         core.debug(`Found file: ${file}`)
+        console.log(`Found file: ${file}`)
       }
 
       return files
@@ -37625,8 +37624,8 @@ class FileManager {
     }
   }
 
-  async getTestResults(directory, pattern) {
-    const files = await this.findFiles(pattern)
+  getTestResults(directory, pattern) {
+    const files = this.findFiles(pattern)
     console.log('Found files:', files)
 
     if (files.length === 0) {
