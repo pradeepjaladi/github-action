@@ -28002,6 +28002,10 @@ class FileManager {
       // Get all matching files as an array
       const files = await globber.glob()
 
+      for (const file of files) {
+        core.debug(`Found file: ${file}`)
+      }
+
       return files
     } catch (error) {
       core.setFailed(`Error finding files: ${error.message}`)
