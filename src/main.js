@@ -47,7 +47,8 @@ async function run() {
     const filePath = path.join(projectBaseDir, '/target')
 
     const fileManager = new FileManager()
-    const files = fileManager.getTestResults(filePath, pattern)
+    const files = await fileManager.getTestResults(filePath, pattern)
+
     console.log('Found files:', files)
   } catch (error) {
     // Fail the workflow run if an error occurs

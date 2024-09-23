@@ -8,13 +8,13 @@ class FileManager {
    * @param {string} pattern - The glob pattern to match file names.
    * @returns {Promise<string[]>} A promise that resolves to an array of matching file paths.
    */
-  findFiles(pattern) {
+  async findFiles(pattern) {
     try {
       // Create a globber object with the specified pattern
-      const globber = glob.create(pattern)
+      const globber = await glob.create(pattern)
 
       // Get all matching files as an array
-      const files = globber.glob()
+      const files = await globber.glob()
 
       for (const file of files) {
         core.debug(`Found file: ${file}`)
@@ -28,8 +28,8 @@ class FileManager {
     }
   }
 
-  getTestResults(directory, pattern) {
-    const files = this.findFiles(pattern)
+  async getTestResults(directory, pattern) {
+    const files = await this.findFiles(pattern)
     console.log('Found files:', files)
 
     if (files.length === 0) {
